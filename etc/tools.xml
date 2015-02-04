@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	
+	<!--
+     #################### DV Sizing Architecture Tool ###################
+     -->
+     <!-- 
+         What is the total number of data sources going to be integrated? 
+      -->
+     <entry key="sizeRecommendation.datasources.count">2</entry>
+     
+     <!-- 
+     	How many concurrent queries at peak load time do you want to support?
+      -->
+     <entry key="sizeRecommendation.queries.concurrent">500</entry>
+     
+     <!-- 
+     	How many client queries needs to be supported per second?
+      -->
+     <entry key="sizeRecommendation.queries.per.second">200</entry>
+     
+     <!-- 
+     	Average row count from each physical source?
+      -->
+     <entry key="sizeRecommendation.row.count.each">10000</entry>
+     
+     <!-- 
+     	What is the average row size in bytes that is returned from each source?
+      -->
+     <entry key="sizeRecommendation.row.size.each">100</entry>
+     
+     <!-- 
+     	Average time in milliseconds by each source to return a result?
+      -->
+     <entry key="sizeRecommendation.avg.time.each">1000</entry>
+     
+     <!-- 
+     	What is average row size that expected as result of federated query in bytes?
+      -->
+     <entry key="sizeRecommendation.row.size.federated">1000</entry>
+     
+     <!-- 
+     	Average row count expected as result of federated query?
+      -->
+     <entry key="sizeRecommendation.row.count.federated">10000</entry>
+     
+     <!-- 
+     	Average time taken in milliseconds to execute a client query in sample runs?
+      -->
+     <entry key="sizeRecommendation.avg.time.sample">2000</entry>
+     
+     <!-- 
+     	 Does client query doing aggregations, sorts or view transformations doing sorts and aggregations?
+     	  Yes | No
+      -->
+     <entry key="sizeRecommendation.sorts.aggregations">No</entry>
+
+	
+	
+	
+</properties>
