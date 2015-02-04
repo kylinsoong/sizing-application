@@ -9,7 +9,7 @@ Teiid Sizing Application that provides size based recommendations after answer a
 
 * Install JDK 1.6 or higher
 * Install maven 3
-* Create a github account and fork Teiid
+* Create a github account and fork Project
 
 Enter the following:
 

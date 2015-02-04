@@ -63,6 +63,16 @@
 		<version>${version.resteasy}</version>
 	    </dependency>
 	    <dependency>
+		<groupId>org.jboss.resteasy</groupId>
+		<artifactId>jaxrs-api</artifactId>
+		<version>${version.resteasy}</version>
+	    </dependency>
+	    <dependency>
+		<groupId>org.jboss.resteasy</groupId>
+		<artifactId>resteasy-jaxrs</artifactId>
+	        <version>${version.resteasy}</version>
+	    </dependency>
+	    <dependency>
 		<groupId>junit</groupId>
 		<artifactId>junit</artifactId>
 		<version>${version.junit}</version>
