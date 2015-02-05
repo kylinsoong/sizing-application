@@ -12,7 +12,6 @@ public class TestMD5Encrypt {
 	public void testMD5Encrypt() {
 		MD5Encrypt md5 = new MD5Encrypt(PING);
 		assertEquals(md5.generatePassCode(), md5.generatePassCode());
-//		System.out.println(md5.generatePassCode());
 	}
 
 }

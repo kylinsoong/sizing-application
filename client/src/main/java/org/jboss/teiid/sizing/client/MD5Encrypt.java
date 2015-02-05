@@ -28,35 +28,31 @@ public class MD5Encrypt {
 		md5.update(encrypt.getBytes(), 0, encrypt.length());
 		return new BigInteger(1,md5.digest()).toString(16);
 	}
+
+	public String getToken() {
+		long time = getTime(new Date());
+		long token = time / (60 * 60 * 24 * 3);
+		return String.valueOf(token);
+	}
 	
-	public static String generatePassCode(String ping) throws NoSuchAlgorithmException {
-		String token = getToken();
-		String encrypt = ping + token;
-		MessageDigest md5 = MessageDigest.getInstance("MD5");
-		md5.update(encrypt.getBytes(), 0, encrypt.length());
-		return new BigInteger(1,md5.digest()).toString(16);
+	public String getTimeStamp(Date date) {
+		long stamp = getTime(date);
+		return String.valueOf(stamp);
+	}
+	
+	public String getTimeStamp(int year, int month, int date) {
+		long stamp = getTime(year, month, date);
+		return String.valueOf(stamp);
 	}
 
-	public static String getToken() {
-		String base = new Date().getTime() + "";
-		Long token = new Long(base.substring(0, base.length() - 3));
-		token = token / (60*60*24*3);
-		return token.toString();
+	public long getTime(Date date) {
+		return date.getTime() / 1000;
 	}
-
-	public static void main(String[] args) {
-		
-		long ping = 1422947470 /(60*60*24*3);
-		System.out.println(ping);
-		
-		System.out.println(new java.util.Date().getTime());
+	
+	public long getTime(int year, int month, int date) {
 		
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(2015, 2, 4);
-		
-		System.out.println(calendar.getTime().getTime());
-		
-
+		calendar.set(year, month, date);
+		return getTime(calendar.getTime());
 	}
-
 }

@@ -1,18 +1,34 @@
 package org.jboss.teiid.sizing.client;
 
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Calendar;
+import java.util.Date;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScheme;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
+import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
@@ -35,27 +51,29 @@ public class RestClient {
 	static String start;
 	static String end;
 	
-	static final String GET_ALL = BASE_URL + "/application/recommendations?" + pass_code;
-	static final String GET_SECTION = BASE_URL + "?start_at=" + start + "&end_at=" + end + "&pass_code=" + pass_code;
+	static String GET_ALL = BASE_URL + "/application/recommendations?" + pass_code;
+	static String GET_SECTION = BASE_URL + "?start_at=" + start + "&end_at=" + end + "&pass_code=" + pass_code;
 
-	public static void main(String[] args) throws NoSuchAlgorithmException {
+	
+	
+	
+	public static void main(String[] args) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
 		
-		AuthCache authCache = new BasicAuthCache();
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(2015, 1, 1);
+		Date start = calendar.getTime();
+		Date end = new Date();
+		String url = RestClientHelper.getURL(HOSTNAME,start, end);
 		
-		AuthScheme basicAuth = new BasicScheme();
-		authCache.put(new HttpHost(BASE_URL), basicAuth);
-		
-		BasicHttpContext localContext = new BasicHttpContext();
-		localContext.setAttribute(HttpClientContext.AUTH_CACHE, authCache);
-		
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		ApacheHttpClient4Engine engine = new ApacheHttpClient4Engine(httpClient, localContext);
-		
-		ResteasyClient client = new ResteasyClientBuilder().httpEngine(engine).build();
-		ResteasyWebTarget target = client.target(TMP_URL);
+		ResteasyClient client = RestClientHelper.createResteasyClient(HOSTNAME, USER, PASS);
+
+		ResteasyWebTarget target = client.target(url);
 		Response response = target.request().get();
-		Object obj = response.getEntity();
-		System.out.println(obj);
+		System.out.println(response);
+		System.out.println(response.getStatus());
+	
+		
+		client.close();
 	}
 	
 
