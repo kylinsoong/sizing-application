@@ -62,42 +62,38 @@ public class RestClientHelper {
 	public static ResteasyClient createResteasyClient() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException{
 		return createResteasyClient(DEFAULT_HOST, DEFAULT_USER, DEFAULT_PASS);
 	}
-
-	public static ResteasyClient createResteasyClient(String hostname, String username, String password) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-		
+	
+	public static HttpClient createHttpClient(HttpHost targetHost, String username, String password) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
 		HttpClientBuilder builder = HttpClientBuilder.create();
-		HttpClientContext context = null;
 		
-		// authentication
 		if (username != null && password != null) {
-			
 			CredentialsProvider credsProvider = new BasicCredentialsProvider();
-			
-//			AuthScope scope = new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM);
-			HttpHost targetHost = new HttpHost(hostname, 443, "https");
 			AuthScope scope = new AuthScope(targetHost.getHostName(), targetHost.getPort());
 			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
-			
 			credsProvider.setCredentials(scope, credentials);
-			
-			AuthCache authCache = new BasicAuthCache();
-			BasicScheme basicAuth = new BasicScheme();
-			authCache.put(targetHost, basicAuth);
-			
-			context = HttpClientContext.create();
-			context.setCredentialsProvider(credsProvider);
-			context.setAuthCache(authCache);
-
 			builder.setDefaultCredentialsProvider(credsProvider);
 		}
 		
-		// disable SSL
+		// ignore SSL
 		SSLContextBuilder sslbuilder = new SSLContextBuilder();
 		sslbuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
 		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslbuilder.build());
 		builder.setSSLSocketFactory(sslsf);
 		
-		HttpClient httpClient = builder.build();
+		return builder.build();
+	}
+
+	public static ResteasyClient createResteasyClient(String hostname, String username, String password) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+		
+		HttpHost targetHost = new HttpHost(hostname, 443, "https");
+		HttpClient httpClient = createHttpClient(targetHost, username, password);
+		
+		AuthCache authCache = new BasicAuthCache();
+		BasicScheme basicAuth = new BasicScheme();
+		authCache.put(targetHost, basicAuth);
+		HttpClientContext context = HttpClientContext.create();
+		context.setAuthCache(authCache);
+		
 		ApacheHttpClient4Engine engine = new ApacheHttpClient4Engine(httpClient, context);
 		
 		ResteasyClient client = new ResteasyClientBuilder().httpEngine(engine).build();
