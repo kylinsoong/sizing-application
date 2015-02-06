@@ -55,4 +55,14 @@ public class MD5Encrypt {
 		calendar.set(year, month, date);
 		return getTime(calendar.getTime());
 	}
+	
+	public static void main(String[] args) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(2015, 1, 1);
+		Date start = calendar.getTime();
+		Date end = new Date();
+		String url = RestClientHelper.getURL("access.devgssci.devlab.phx1.redhat.com",start, end);
+		
+		System.out.println(url);
+	}
 }
