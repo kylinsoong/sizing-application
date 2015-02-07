@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-    	<groupId>org.jboss.integration-platform</groupId>
-    	<artifactId>jboss-integration-platform-parent</artifactId>
-    	<version>6.0.0.CR13</version>	
+        <groupId>org.jboss.integration-platform</groupId>
+        <artifactId>jboss-integration-platform-parent</artifactId>
+        <version>6.0.0.CR13</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.jboss.teiid.sizing</groupId>
@@ -16,112 +16,118 @@
     <url>http://jboss.org/teiid</url>
 
     <properties>
-	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<illegaltransitivereportonly>true</illegaltransitivereportonly>
-			
-	<version.org.jboss.integration-platform>6.0.0.CR13</version.org.jboss.integration-platform>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <illegaltransitivereportonly>true</illegaltransitivereportonly>
 
-	<version.org.jboss.bom.jboss-javaee-6.0-with-tools>1.0.7.Final</version.org.jboss.bom.jboss-javaee-6.0-with-tools>
+        <version.org.jboss.integration-platform>6.0.0.CR13</version.org.jboss.integration-platform>
 
-	<version.teiid>8.9.0.Final</version.teiid>
-	<version.derby>10.11.1.1</version.derby>
-	<version.resteasy>3.0.0.Final</version.resteasy>
+        <version.org.jboss.bom.jboss-javaee-6.0-with-tools>1.0.7.Final
+        </version.org.jboss.bom.jboss-javaee-6.0-with-tools>
 
-        <version.jboss.as.plugin>7.4.Final</version.jboss.as.plugin>       
+        <version.teiid>8.9.0.Final</version.teiid>
+        <version.derby>10.11.1.1</version.derby>
+        <version.resteasy>3.0.8.Final</version.resteasy>
+
+        <version.jboss.as.plugin>7.4.Final</version.jboss.as.plugin>
         <version.org.codehaus.mojo.exec.plugin>1.2.1</version.org.codehaus.mojo.exec.plugin>
     </properties>
-	
+
     <dependencyManagement>
-	<dependencies>	
-	    <dependency>
-            	<groupId>org.jboss.integration-platform</groupId>
-            	<artifactId>jboss-integration-platform-bom</artifactId>
-            	<version>${version.org.jboss.integration-platform}</version>
-            	<scope>import</scope>
-            	<type>pom</type>
-	    </dependency> 		
+        <dependencies>
+            <dependency>
+                <groupId>org.jboss.integration-platform</groupId>
+                <artifactId>jboss-integration-platform-bom</artifactId>
+                <version>${version.org.jboss.integration-platform}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
             <dependency>
                 <groupId>org.jboss.bom</groupId>
                 <artifactId>jboss-javaee-6.0-with-tools</artifactId>
                 <version>${version.org.jboss.bom.jboss-javaee-6.0-with-tools}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>  
-	    <dependency>
-		<groupId>org.jboss.teiid</groupId>
-		<artifactId>teiid-common-core</artifactId>
-		<version>${version.teiid}</version>
-	    </dependency> 
-	    <dependency>
-		<groupId>org.apache.derby</groupId>
-		<artifactId>derby</artifactId>
-		<version>${version.derby}</version>
-	    </dependency> 
-	    <dependency>
-		<groupId>org.jboss.resteasy</groupId>
-		<artifactId>resteasy-client</artifactId>
-		<version>${version.resteasy}</version>
-	    </dependency>
-	    <dependency>
-		<groupId>org.jboss.resteasy</groupId>
-		<artifactId>jaxrs-api</artifactId>
-		<version>${version.resteasy}</version>
-	    </dependency>
-	    <dependency>
-		<groupId>org.jboss.resteasy</groupId>
-		<artifactId>resteasy-jaxrs</artifactId>
-	        <version>${version.resteasy}</version>
-	    </dependency>
-	    <dependency>
-		<groupId>junit</groupId>
-		<artifactId>junit</artifactId>
-		<version>${version.junit}</version>
-		<scope>test</scope>
-	    </dependency>
-         </dependencies>      
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.teiid</groupId>
+                <artifactId>teiid-common-core</artifactId>
+                <version>${version.teiid}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>${version.derby}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-client</artifactId>
+                <version>${version.resteasy}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jackson2-provider</artifactId>
+                <version>${version.resteasy}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>jaxrs-api</artifactId>
+                <version>${version.resteasy}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jaxrs</artifactId>
+                <version>${version.resteasy}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
     </dependencyManagement>
 
     <modules>
-	<module>utils</module>
-	<module>client</module>
+        <module>utils</module>
+        <module>client</module>
     </modules>
 
     <build>
         <plugins>
-	  <!-- Specify the compiler options and settings -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>${maven.compiler.source}</source>
-					<target>${maven.compiler.target}</target>
-					<showDeprecation>false</showDeprecation>
-					<showWarnings>false</showWarnings>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<includes>
-						<include>**/*TestCase.java</include>
-						<include>**/*Test.java</include>
-						<include>**/Test*.java</include>
-					</includes>
-					<excludes>
-						<exclude>**/Abstract*TestCase.java</exclude>
-			<!-- hack to prevent anonymous inner classes in Tests from being run as tests -->
-						<include>**/Test*$*.java</include>
-					</excludes>
-					<systemPropertyVariables>
-						<user.dir>${basedir}/target</user.dir>
-						<java.io.tmpdir>${basedir}/target</java.io.tmpdir>
-					</systemPropertyVariables>
-				</configuration>
-			</plugin>
-      <!-- 
-      Build a test-jar for each project, so that src/test/* resources and classes can be used
-      in other projects.  Also customize how the jar files are assembled.
-      -->
+            <!-- Specify the compiler options and settings -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <showDeprecation>false</showDeprecation>
+                    <showWarnings>false</showWarnings>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*TestCase.java</include>
+                        <include>**/*Test.java</include>
+                        <include>**/Test*.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/Abstract*TestCase.java</exclude>
+                        <!-- hack to prevent anonymous inner classes in Tests from being run as tests -->
+                        <include>**/Test*$*.java</include>
+                    </excludes>
+                    <systemPropertyVariables>
+                        <user.dir>${basedir}/target</user.dir>
+                        <java.io.tmpdir>${basedir}/target</java.io.tmpdir>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <!--
+            Build a test-jar for each project, so that src/test/* resources and classes can be used
+            in other projects.  Also customize how the jar files are assembled.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -134,10 +140,10 @@
                     </execution>
                 </executions>
             </plugin>
- 		</plugins>            
-	</build>
+        </plugins>
+    </build>
 
-    <profiles>    
+    <profiles>
         <profile>
             <id>dist</id>
             <activation>
