@@ -1,0 +1,3 @@
+## Languages supported setting
+/system-property=org.jboss.dashboard.LocaleManager.installedLocaleIds:add(value="en,zh")
+/system-property=org.jboss.dashboard.LocaleManager.defaultLocaleId:add(value=en)
