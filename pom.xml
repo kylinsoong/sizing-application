@@ -15,6 +15,13 @@
     <packaging>pom</packaging>
     <url>http://jboss.org/teiid</url>
 
+    <repositories>
+        <repository>
+            <id>redhat.com</id>
+            <url>https://maven.repository.redhat.com/earlyaccess/all/</url>
+        </repository>
+    </repositories>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <illegaltransitivereportonly>true</illegaltransitivereportonly>
@@ -34,6 +41,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>1.8.1</version>
+            </dependency>
             <dependency>
                 <groupId>org.jboss.integration-platform</groupId>
                 <artifactId>jboss-integration-platform-bom</artifactId>
