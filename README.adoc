@@ -1,6 +1,6 @@
 = Teiid Sizing Application
 
-Teiid Sizing Application contains a series of tools/utils that provides sizing, profiling, tuning recommendations for runing http://teiid.jboss.org/[Teiid Server] or http://www.jboss.org/products/datavirt/overview/[Red Hat JBoss Data Virtualization].
+Teiid Sizing Application contains a series of tools/utils that provides sizing, profiling recommendations for runing http://teiid.jboss.org/[Teiid Server] or http://www.jboss.org/products/datavirt/overview/[Red Hat JBoss Data Virtualization].
 
 Features:
 
