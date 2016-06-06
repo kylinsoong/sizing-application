@@ -23,13 +23,26 @@ package org.teiid.sizing;
 
 public class TeiidUtils {
     
+    public static final long ROW_SIZE = 1 << 8;
+    public static final long KB = 1 << 10;
+    public static final long MB = 1 << 20;
+    
+    public static final String LOGGING_CONTEXT = "org.teiid.sizing";
+    
+    public static final String TABEL_CREATE = "CREATE TABLE DESERIALIZETEST (COL_A CHAR(32), COL_B CHAR(32), COL_C CHAR(32), COL_D CHAR(32), COL_E CHAR(32), COL_F CHAR(32), COL_G CHAR(32), COL_H CHAR(32))";
+    public static final String TABEL_INSERT = "INSERT INTO DESERIALIZETEST (COL_A, COL_B, COL_C, COL_D, COL_E, COL_F, COL_G, COL_H) VALUES (?,?,?,?,?,?,?,?)";
+    
+    public static String char32string() {
+        return "";
+    }
+    
     private static final String TAB = "    ";
     private static final String COLON = ": ";
     
     private static final String TOOLS_SERIALIZATION = "serialization";
     private static final String TOOLS_DESERIALIZATION = "deserialization";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         if(args.length <= 0){
             usage();

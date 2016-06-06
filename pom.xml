@@ -16,7 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <version.teiid>8.9.0.Final</version.teiid>
-        <version.derby>10.11.1.1</version.derby>
+        <version.derby>10.12.1.1</version.derby>
 	<version.junit>4.8.2</version.junit>
 
 	<maven.compiler.source>1.8</maven.compiler.source>
@@ -26,6 +26,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.jboss.teiid</groupId>
+                <artifactId>teiid-api</artifactId>
+                <version>${version.teiid}</version>
+            </dependency>
+	    <dependency>
                 <groupId>org.jboss.teiid</groupId>
                 <artifactId>teiid-common-core</artifactId>
                 <version>${version.teiid}</version>

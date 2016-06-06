@@ -21,21 +21,125 @@
 */
 package org.teiid.sizing;
 
+import static org.teiid.sizing.util.JDBCUtils.*;
+import static org.teiid.sizing.TeiidUtils.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import org.teiid.logging.LogManager;
+
 public class Deserialization {
+    
+    private final long size;
+    private final int count;
 
-    public static void main(String[] args) {
-
-        if(args.length <= 0) {
-            usage();
+    public Deserialization(long size, int count) {
+        super();
+        this.size = size;
+        this.count = count;
+    }
+    
+    public void start() throws Exception {
+        
+        preparation();
+    }
+    
+    /**
+     * Check the db preparation data by parameter <size>
+     *
+     */
+    private void preparation() throws Exception {
+        
+        String driver = "org.apache.derby.jdbc.EmbeddedDriver";
+        String url = "jdbc:derby:./target/derbyDB;create=true";
+        
+        Connection conn = getConnection(driver, url, "user", "user");
+        
+        try {
+            execute(conn, TABEL_CREATE, false);
+        } catch (SQLException e) {
+            LogManager.logInfo(LOGGING_CONTEXT, e.getMessage());
         }
         
-        for(String str : args) {
-            System.out.println(str);
+        long rowCount = executeGetCount(conn, "SELECT COUNT(col_a) FROM DESERIALIZETEST");
+        long expectRow = MB * size / ROW_SIZE;
+        if(rowCount < expectRow){
+            initTestData(rowCount, expectRow, conn);
+        }
+        
+        System.out.println(rowCount);
+        
+        close(conn);
+    }
+
+    private void initTestData(long rowCount, long expectRow, Connection conn) throws SQLException {
+
+        long count = expectRow - rowCount;
+        long index = 0;
+        int insertSize = 0;
+        
+        boolean autoCommit = conn.getAutoCommit();
+        conn.setAutoCommit(false);
+        PreparedStatement pstmt = null;
+        long start = System.currentTimeMillis();
+        System.out.println("Insert Data to DESERIALIZETEST");
+        
+        try {
+            pstmt = conn.prepareStatement(TABEL_INSERT);
+            
+            for(long i = 0 ; i < count ; i ++) {
+                
+                pstmt.setString(1, char32string());
+                pstmt.setString(2, char32string());
+                pstmt.setString(3, char32string());
+                pstmt.setString(4, char32string());
+                pstmt.setString(5, char32string());
+                pstmt.setString(6, char32string());
+                pstmt.setString(7, char32string());
+                pstmt.setString(8, char32string());
+                pstmt.addBatch();
+                
+                index ++;
+                if(index == MB / ROW_SIZE){
+                    pstmt.executeBatch();
+                    conn.commit();
+                    index = 0;
+                    insertSize ++;
+                    System.out.print('.');
+                }
+            }
+        } finally {
+            close(pstmt);
+            conn.setAutoCommit(autoCommit);
+            System.out.println("\nInsert " + count + " rows, szie " + insertSize + "MB, spend " + (System.currentTimeMillis() - start) + " milliseconds");
         }
     }
 
+    public static void main(String[] args) throws Exception {
+        
+        int size =100, count =1000;
+
+        if(args.length <= 0) {
+            usage();
+        } else {
+            try {
+                size = Integer.parseInt(args[0]);
+                count = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                usage();
+            }
+            
+            new Deserialization(size, count).start();
+        }
+          
+    }
+
+    
+
     private static void usage() {
-        System.out.println("Usage: deserialization <p1> <p2>");
+        System.out.println("Usage: deserialization <size(MB)> <counts>");
     }
 
 }

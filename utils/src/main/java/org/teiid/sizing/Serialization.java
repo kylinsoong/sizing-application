@@ -22,7 +22,7 @@
 package org.teiid.sizing;
 
 public class Serialization {
-
+    
     public static void main(String[] args) {
 
         if(args.length <= 0) {
