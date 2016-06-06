@@ -1,0 +1,22 @@
+= Teiid Sizing Application
+
+Teiid Sizing Application contains a series of tools/utils that provides sizing, profiling, tuning recommendations for runing http://teiid.jboss.org/[Teiid Server] or http://www.jboss.org/products/datavirt/overview/[Red Hat JBoss Data Virtualization].
+
+Features:
+
+* Serializing/Deserializing linear regression rate caculation
+
+== Build
+
+* Install JDK 1.7 or higher
+* Install maven 3
+* Create a github account and fork Project
+
+Enter the following:
+
+----
+$ git clone https://github.com/<yourname>/teiid-sizing-application.git
+$ cd teiid-sizing-application
+$ mvn clean install
+----
+

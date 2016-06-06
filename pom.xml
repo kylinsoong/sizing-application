@@ -15,12 +15,6 @@
     <packaging>pom</packaging>
     <url>http://jboss.org/teiid</url>
 
-    <repositories>
-        <repository>
-            <id>redhat.com</id>
-            <url>https://maven.repository.redhat.com/earlyaccess/all/</url>
-        </repository>
-    </repositories>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
