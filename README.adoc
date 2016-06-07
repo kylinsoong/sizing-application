@@ -17,6 +17,18 @@ Enter the following:
 ----
 $ git clone https://github.com/<yourname>/teiid-sizing-application.git
 $ cd teiid-sizing-application
-$ mvn clean install
+$ mvn clean install -P release
 ----
 
+you will find distribution `teiid-sizing-jar.jar` under "build/target" directory once the build is completed.
+
+
+== Run
+
+|===
+|Utils |Description |Notes
+
+|java -jar teiid-sizing-jar.jar deserialization <size>, <counts>
+|A tool is used to calculate deserializing linear regression rate between size and time. <size> - total size in MB to be deserialized, a integer, eg, 100, 200, etc. <counts> - total number of tuples(size, time) to be collected, a integer which should be equals 1 << X, eg, 128, 256, 512, 1024, 2048, etc
+|deserialization will run several minutes if parameter size setting is large.
+|===

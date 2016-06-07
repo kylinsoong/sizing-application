@@ -21,6 +21,11 @@
 */
 package org.teiid.sizing;
 
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+
+import org.apache.commons.lang3.RandomStringUtils;
+
 public class TeiidUtils {
     
     public static final long ROW_SIZE = 1 << 8;
@@ -28,12 +33,45 @@ public class TeiidUtils {
     public static final long MB = 1 << 20;
     
     public static final String LOGGING_CONTEXT = "org.teiid.sizing";
+    public static final String LOGGING_SQL_CONTEXT = "org.teiid.sizing.SQL";
     
+    // From https://db.apache.org/derby/docs/10.12/ref/rrefsqlj13733.html
+    // length is an unsigned integer literal designating the length in bytes. The default length for a CHAR is 1
+    // one column size is 32 bytes, (1 << 5) or (2 ^ 5)
+    // one row(8 columns) size 256 bytes, (1 << 8) or (2 ^ 8) 
     public static final String TABEL_CREATE = "CREATE TABLE DESERIALIZETEST (COL_A CHAR(32), COL_B CHAR(32), COL_C CHAR(32), COL_D CHAR(32), COL_E CHAR(32), COL_F CHAR(32), COL_G CHAR(32), COL_H CHAR(32))";
     public static final String TABEL_INSERT = "INSERT INTO DESERIALIZETEST (COL_A, COL_B, COL_C, COL_D, COL_E, COL_F, COL_G, COL_H) VALUES (?,?,?,?,?,?,?,?)";
+    public static final String TABEL_TRUNCATE = "TRUNCATE TABLE DESERIALIZETEST";
+    
+    public static final String TABEL_DESERIALIZERESULT_CREATE = "CREATE TABLE DESERIALIZERESULT (D_SIZE BIGINT, D_TIME INT, GC_TIME INT, GC_COUNT INT)";
+    public static final String TABEL_DESERIALIZERESULT_TRUNCATE = "TRUNCATE TABLE DESERIALIZERESULT";
     
     public static String char32string() {
-        return "";
+        return RandomStringUtils.randomAlphabetic(32);
+    }
+    
+    public static long collectionCount() {
+        long totalGarbageCollections = 0;
+        
+        for(GarbageCollectorMXBean gc : ManagementFactory.getGarbageCollectorMXBeans()) {
+            long count = gc.getCollectionCount();
+            if(count >= 0) {
+                totalGarbageCollections += count;
+            }
+        }        
+        return totalGarbageCollections;
+    }
+    
+    public static long collectionTimes() {
+        long garbageCollectionTime = 0;
+        
+        for(GarbageCollectorMXBean gc : ManagementFactory.getGarbageCollectorMXBeans()) {
+            long time = gc.getCollectionTime();
+            if(time >= 0) {
+                garbageCollectionTime += time;
+            }
+        }        
+        return garbageCollectionTime;
     }
     
     private static final String TAB = "    ";

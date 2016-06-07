@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+    	<groupId>org.jboss.teiid.sizing</groupId>
+    	<artifactId>teiid-sizing</artifactId>
+    	<version>2.0.0</version>	
+    </parent>		
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>build</artifactId>
+    <name>Teiid Sizing Application Build</name>
+    <description>Teiid Sizing Application Build</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.teiid.sizing</groupId>
+            <artifactId>teiid-sizing-utils</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+	<plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>assembly/jar-assembly.xml</descriptor>
+                    </descriptors>
+                    <finalName>${teiid.sizing.dist}</finalName>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.teiid.sizing.TeiidUtils</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>jar-with-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+	</plugins>
+    </build>
+
+</project>

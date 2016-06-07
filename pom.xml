@@ -18,7 +18,11 @@
         <version.teiid>8.9.0.Final</version.teiid>
         <version.derby>10.12.1.1</version.derby>
 	<version.junit>4.8.2</version.junit>
+	<version.commons-lang3>3.4</version.commons-lang3>
 
+	<teiid.sizing.dist>teiid-sizing</teiid.sizing.dist>
+
+	<version.assembly.plugin>2.5.5</version.assembly.plugin>
 	<maven.compiler.source>1.8</maven.compiler.source>
 	<maven.compiler.target>1.8</maven.compiler.target>
     </properties>
@@ -40,11 +44,21 @@
                 <artifactId>derby</artifactId>
                 <version>${version.derby}</version>
             </dependency>
+	    <dependency>
+   	        <groupId>org.apache.commons</groupId>
+  	        <artifactId>commons-lang3</artifactId>
+  	        <version>${version.commons-lang3}</version>
+	    </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${version.junit}</version>
                 <scope>test</scope>
+            </dependency>
+	    <dependency>
+                <groupId>org.jboss.teiid.sizing</groupId>
+                <artifactId>teiid-sizing-utils</artifactId>
+		<version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -54,6 +68,15 @@
     </modules>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>${version.assembly.plugin}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <!-- Specify the compiler options and settings -->
             <plugin>
@@ -90,15 +113,19 @@
 
     <profiles>
         <profile>
-            <id>dist</id>
-            <activation>
-                <file>
-                    <exists>dist</exists>
-                </file>
-            </activation>
+            <id>release</id>
+            <properties>
+                <maven.javadoc.skip>true</maven.javadoc.skip>
+            </properties>
             <modules>
-                <module>dist</module>
+                <module>build</module>
             </modules>
+            <build>
+                <plugins>
+                </plugins>
+            </build>
         </profile>
     </profiles>
+
+
 </project>
