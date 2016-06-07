@@ -25,10 +25,15 @@ you will find distribution `teiid-sizing-jar.jar` under "build/target" directory
 
 == Run
 
+[cols="5a,2,2"]
 |===
 |Utils |Description |Notes
 
-|java -jar teiid-sizing-jar.jar deserialization <size> <counts>
+|
+[source,java]
+----
+java -jar teiid-sizing-jar.jar deserialization <size> <counts>
+----
 |A tool is used to calculate deserializing linear regression rate between size and time. <size> - total size in MB to be deserialized, a integer, eg, 100, 200, etc. <counts> - total number of tuples(size, time) to be collected, a integer which should be equals 1 << X, eg, 128, 256, 512, 1024, 2048, etc
 |deserialization will run several minutes if parameter size setting is large.
 |===
