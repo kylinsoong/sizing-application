@@ -31,6 +31,7 @@ public class TeiidUtils {
     public static final long ROW_SIZE = 1 << 8;
     public static final long KB = 1 << 10;
     public static final long MB = 1 << 20;
+    public static final int MB_ROW = 4096; //MB / ROW_SIZE
     
     public static final String LOGGING_CONTEXT = "org.teiid.sizing";
     public static final String LOGGING_SQL_CONTEXT = "org.teiid.sizing.SQL";
@@ -45,6 +46,8 @@ public class TeiidUtils {
     
     public static final String TABEL_DESERIALIZERESULT_CREATE = "CREATE TABLE DESERIALIZERESULT (D_SIZE BIGINT, D_TIME INT, GC_TIME INT, GC_COUNT INT)";
     public static final String TABEL_DESERIALIZERESULT_TRUNCATE = "TRUNCATE TABLE DESERIALIZERESULT";
+    public static final String SQL_DUMP_TUPLES = "SELECT D_SIZE AS SIZE, (D_TIME - GC_TIME) AS TIME FROM DESERIALIZERESULT";
+    
     
     public static String char32string() {
         return RandomStringUtils.randomAlphabetic(32);
