@@ -23,6 +23,7 @@ package org.teiid.sizing;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
+import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -46,7 +47,8 @@ public class TeiidUtils {
     
     public static final String TABEL_DESERIALIZERESULT_CREATE = "CREATE TABLE DESERIALIZERESULT (D_SIZE BIGINT, D_TIME INT, GC_TIME INT, GC_COUNT INT)";
     public static final String TABEL_DESERIALIZERESULT_TRUNCATE = "TRUNCATE TABLE DESERIALIZERESULT";
-    public static final String SQL_DUMP_TUPLES = "SELECT D_SIZE AS SIZE, (D_TIME - GC_TIME) AS TIME FROM DESERIALIZERESULT";
+    public static final String SQL_DUMP_TUPLES = "SELECT SIZE, TIME, CAST((DOUBLE(TIME) / DOUBLE (SIZE)) AS DECIMAL(10,10))AS WEIGHT FROM (SELECT D_SIZE AS SIZE, (D_TIME - GC_TIME) AS TIME FROM DESERIALIZERESULT) AS TMPTABLE";
+    public static final String SQL_WEIGHT_TUPLES = "SELECT CAST((DOUBLE(TIME) / DOUBLE (SIZE)) AS DECIMAL(10,10))AS WEIGHT FROM (SELECT D_SIZE AS SIZE, (D_TIME - GC_TIME) AS TIME FROM DESERIALIZERESULT) AS TMPTABLE";
     
     
     public static String char32string() {
@@ -75,6 +77,15 @@ public class TeiidUtils {
             }
         }        
         return garbageCollectionTime;
+    }
+    
+    public static double average(List<Double> items) {
+        double sum = 0;
+        for(Double d : items) {
+            sum += d;
+        }
+        double size = items.size();
+        return sum / size;
     }
     
     private static final String TAB = "    ";

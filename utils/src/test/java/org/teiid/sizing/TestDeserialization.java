@@ -23,7 +23,7 @@ public class TestDeserialization {
         } catch (Exception e) {
         }
         
-        Deserialization deserialization = new Deserialization(5, 32, false);
+        Deserialization deserialization = new Deserialization(5, 32, 0.75, false, false);
         deserialization.preparation();
         
         String sql = "SELECT COL_A, COL_B, COL_C, COL_D, COL_E, COL_F, COL_G, COL_H FROM DESERIALIZETEST";
@@ -63,10 +63,10 @@ public class TestDeserialization {
     //TODO-- need remove
     public static void main(String[] args) throws Exception {
 
-//        args = new String[]{"deserialization", "100", "4", "true"};
-//        TeiidUtils.main(args);
+        args = new String[]{"deserialization", "100", "128", "0.75", "true", "true"};
+        TeiidUtils.main(args);
 
         Connection conn = getConnection(driver, url, username, password);
-        execute(conn, "SELECT D_SIZE AS SIZE, (D_TIME - GC_TIME) AS TIME FROM DESERIALIZERESULT", true);
+        execute(conn, "SELECT SIZE, TIME, CAST((DOUBLE(TIME) / DOUBLE (SIZE)) AS DECIMAL(10,10))AS WEIGHT FROM (SELECT D_SIZE AS SIZE, (D_TIME - GC_TIME) AS TIME FROM DESERIALIZERESULT) AS TMPTABLE", true);
     }
 }

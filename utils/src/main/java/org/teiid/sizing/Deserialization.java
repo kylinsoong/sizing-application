@@ -30,6 +30,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -42,16 +46,20 @@ public class Deserialization {
     private final long size;
     private final int count;
     private final boolean dumptuples;
+    private final double ratio;
+    private final boolean refresh;
     
     static String driver = "org.apache.derby.jdbc.EmbeddedDriver";
     static String url = "jdbc:derby:./target/derbyDB;create=true";
     static String username = "user";
     static String password = "user";
 
-    public Deserialization(long size, int count, boolean dumptuples) {
+    public Deserialization(long size, int count, double ratio, boolean refresh, boolean dumptuples) {
         super();
         this.size = size;
         this.count = count;
+        this.ratio = ratio;
+        this.refresh = refresh;
         this.dumptuples = dumptuples;
     }
     
@@ -61,11 +69,12 @@ public class Deserialization {
         
         countDeserializingTime();
         
-        countRegressionRate();
+        countRegressionWeight();
     }
     
-    //TODO -- Weka algorithm 
-    public void countRegressionRate() throws Exception {
+    public void countRegressionWeight() throws Exception {
+        
+        System.out.println("Calculating linear regression weight");
         
         Connection conn = getConnection(driver, url, username, password);
         
@@ -73,9 +82,36 @@ public class Deserialization {
             execute(conn, SQL_DUMP_TUPLES, false);
         }
         
-//        execute(conn, "SELECT COUNT(*) FROM DESERIALIZERESULT", false);
-//        execute(conn, "SELECT COUNT(*) FROM DESERIALIZETEST", false);
-//        execute(conn, "SELECT * FROM DESERIALIZERESULT", false);
+        List<Double> roughweights = new ArrayList<>();
+        List<Double> weights = new ArrayList<>();
+        Statement stmt = null;
+        ResultSet rs = null;
+        NumberFormat formatter = new DecimalFormat("#0.0000000000");
+        
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(SQL_WEIGHT_TUPLES);
+            while(rs.next()){
+                roughweights.add(rs.getDouble(1));            
+            }
+        } finally {
+            close(rs, stmt);
+        } 
+        
+        double roughweight = average(roughweights);
+        if(dumptuples){
+            System.out.println("Rough Weight: " + formatter.format(roughweight));
+        }
+        
+        Collections.sort(roughweights);
+        int trim = (int) ((1 - ratio) * roughweights.size()) / 2 ;
+        int start = trim > 0 ? trim -1 : 0 ;
+        for(int i = start ; i < roughweights.size() - trim ; i ++) {
+            weights.add(roughweights.get(i));
+        }
+        
+        double weight = average(weights);
+        System.out.println("      Weight: " + formatter.format(Double.parseDouble(formatter.format(weight))));
         
         close(conn);
     }
@@ -158,8 +194,10 @@ public class Deserialization {
                 LogManager.logInfo(LOGGING_CONTEXT, e.getMessage());
             }
             
-            // each time truncate table
-            execute(conn, TABEL_DESERIALIZERESULT_TRUNCATE, false);
+            // if true truncate tuples table
+            if(refresh) {
+                execute(conn, TABEL_DESERIALIZERESULT_TRUNCATE, false);
+            }
             
             rowCount = executeGetCount(conn, "SELECT COUNT(COL_A) FROM DESERIALIZETEST");
         } finally {
@@ -323,8 +361,10 @@ public class Deserialization {
         
         int size =100, count = 512;
         boolean dumptuples = false;
+        double ratio = 0.75;
+        boolean refresh = false;
 
-        if(args.length <= 0) {
+        if(args.length < 1) {
             usage();
         } else if(args.length == 1){
             try {
@@ -343,7 +383,26 @@ public class Deserialization {
             try {
                 size = Integer.parseInt(args[0]);
                 count = Integer.parseInt(args[1]);
-                dumptuples = Boolean.parseBoolean(args[2]);
+                ratio = Double.parseDouble(args[2]);
+            } catch (NumberFormatException e) {
+                usage();
+            }         
+        } else if(args.length == 4){
+            try {
+                size = Integer.parseInt(args[0]);
+                count = Integer.parseInt(args[1]);
+                ratio = Double.parseDouble(args[2]);
+                refresh = Boolean.parseBoolean(args[3]);
+            } catch (NumberFormatException e) {
+                usage();
+            }         
+        } else if(args.length == 5){
+            try {
+                size = Integer.parseInt(args[0]);
+                count = Integer.parseInt(args[1]);
+                ratio = Double.parseDouble(args[2]);
+                refresh = Boolean.parseBoolean(args[3]);
+                dumptuples = Boolean.parseBoolean(args[4]);
             } catch (NumberFormatException e) {
                 usage();
             }         
@@ -351,11 +410,11 @@ public class Deserialization {
             usage();
         }
         
-        if(count % 2 != 0 && count != 1) {
+        if(count % 2 != 0 && count >= 1) {
             usage();
         }
         
-        new Deserialization(size, count, dumptuples).start();
+        new Deserialization(size, count, ratio, refresh, dumptuples).start();
           
     }
 
@@ -364,10 +423,14 @@ public class Deserialization {
     private static void usage() {
         System.out.println("Usage: deserialization <size>");
         System.out.println("       deserialization <size> <counts>");
-        System.out.println("       deserialization <size> <counts> <dumptuples>");
+        System.out.println("       deserialization <size> <counts> <ratio>");
+        System.out.println("       deserialization <size> <counts> <ratio> <refresh>");
+        System.out.println("       deserialization <size> <counts> <ratio> <refresh> <dumptuples>");
         System.out.println("Options:");
         System.out.println("       <size> - total size in MB to be deserialized, a integer, eg, 100, 200, etc");
         System.out.println("       <counts> - total number of tuples(size, time) to be collected, a integer which should be equals 1 << X, eg, 256, 512, 1024, 2048, etc");
+        System.out.println("       <ratio> - a float, less than 1 and larger than 0, the ratio for regression weight");
+        System.out.println("       <refresh> - whether refresh tuples, default is false");
         System.out.println("       <dumptuples> - whether dump tuples, default is false");
         Runtime.getRuntime().exit(1);
     }
