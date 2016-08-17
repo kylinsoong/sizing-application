@@ -1,45 +1,6 @@
-= Teiid Sizing Application
+= Deserialization Weight Calculation
 
-Teiid Sizing Application contains a series of tools/utils that provides sizing, profiling recommendations for runing http://teiid.jboss.org/[Teiid Server] or http://www.jboss.org/products/datavirt/overview/[Red Hat JBoss Data Virtualization].
-
-Features:
-
-* Serializing/Deserializing linear regression weight caculation
-
-== Build
-
-* Install JDK 1.7 or higher
-* Install maven 3
-* Create a github account and fork Project
-
-Enter the following:
-
-----
-$ git clone https://github.com/<yourname>/teiid-sizing-application.git
-$ cd teiid-sizing-application
-$ mvn clean install -P release
-----
-
-you will find distribution `teiid-sizing-jar.jar` under "build/target" directory once the build is completed.
-
-
-== Run
-
-[cols="5a,2"]
-|===
-|Utils |Name 
-
-|
-[source,java]
-----
-java -jar teiid-sizing-jar.jar deserialization <size>
-----
-|<<Deserialization Weight Calculation, Deserialization Weight Calculation>>
-|===
-
-== Deserialization Weight Calculation
-
-In java deserialization is pretty expensive, we can see it's 100% processor occupation, the size of content to deserialize is critical for performance, the bigger of size, the larger of time. 
+In java deserialization is pretty expensive, we can see it's 100% processor occupation, the size of content to deserialize is critical for performance, the bigger of size, the larger of time.
 
 NOTE: In Linux System, command `cat /proc/cpuinfo | grep "processor" | wc -l` can get the number of total processor.
 
@@ -56,7 +17,7 @@ time = weight * size
 
 NOTE: if we have know the linear regression weight, each time for a deserialization size, it's easy to calculate the deserialization time.
 
-=== What's Deserialization Weight Calculation
+== What's Deserialization Weight Calculation
 
 The Deserialization Weight Calculation is a tool used to calculate the linear regression weight by specify a size.
 
@@ -81,7 +42,7 @@ Calculating linear regression weight
 
 the last line is output the linear regression weight.
 
-=== How to run
+== How to run
 
 In addition to specify a deserialization size, there are other 4 optional options:
 
@@ -121,15 +82,14 @@ $ java -jar teiid-sizing-jar.jar deserialization <size> <counts> <ratio> <refres
 
 NOTE: if counts and size are larger, the deserialization will run long time(several hours).
 
-==== Sample of tuples and weight
+=== Sample of tuples and weight
 
 * link:etc/samples/deserialization-1-1024[deserialization-1-1024] - Collect 1024 tuples against 1 MB deserialization data and calculate weight
 * link:etc/samples/deserialization-100-1024[deserialization-100-1024] - Collect 1024 tuples against 100 MB deserialization data and calculate weight
 * link:etc/samples/deserialization-2048-1024[deserialization-2048-1024] - Collect 1024 tuples against 2 GB deserialization data and calculate weight
 
-=== Conclusion
+== Conclusion
 
 Deserialization time and size in a linear relation, the regression weight is around 0.0000075
 
 image:etc/img/deserialization-weight.png[linear regression weight]
-
