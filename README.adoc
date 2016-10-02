@@ -4,6 +4,7 @@ Sizing Application contains a series of tools/utils that provides sizing, profil
 
 
 .*Available Tools*
+[cols="5a,2"]
 |===
 |Name |Function 
 

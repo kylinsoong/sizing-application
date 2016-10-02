@@ -1,13 +1,24 @@
 package org.teiid.sizing;
 
+import static org.teiid.sizing.Main.*;
+import static org.teiid.sizing.utils.JDBCUtils.*;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class MapPerfBenchmark {
+import org.teiid.logging.LogManager;
+
+public class MapPerfBenchmark implements Tools {
     
     private static final int SIZE = 500000;
     
@@ -30,9 +41,72 @@ public class MapPerfBenchmark {
         }
     }
     
-    public Timer benchmark(final Map<String, Integer> map, int threads) throws InterruptedException{
+    static String driver = "org.apache.derby.jdbc.EmbeddedDriver";
+    static String url = "jdbc:derby:./target/mapPerfDB;create=true";
+    static String username = "user";
+    static String password = "user";
+    
+    private final int count;
+    
+    public MapPerfBenchmark(int count) {
+        this.count = count;
+    }
+    
+    @Override
+    public void start() throws Exception {
+
+        initialization();
         
-        System.out.println("Performance Benchmark for " + map.getClass().getSimpleName() + ", with " + threads + " threads");
+        benchmark();
+        
+        dumpResult();
+    }
+    
+    protected void benchmark() throws Exception {
+
+        int cur = 0;
+        while(true) {
+            
+            cur++ ;
+            for(int i = 0 ; i < 7 ; i ++){
+                int threads = 1 << i ;
+                benchmark(new ConcurrentHashMap<String, Integer>(), threads);
+                benchmark(new ConcurrentSkipListMap<String, Integer>(), threads);
+                benchmark(Collections.synchronizedMap(new HashMap<String, Integer>()), threads);
+                benchmark(Collections.synchronizedMap(new TreeMap<String, Integer>()), threads);
+            }
+            
+            if(cur >= this.count){
+                break;
+            }
+        }
+    }
+
+    protected void dumpResult() throws Exception {
+        
+        execute(getConnection(driver, url, username, password), SQL_MAPPERFBENCHMARK_SELECT, true);
+    }
+
+    protected void initialization() throws Exception {
+        
+        Connection conn = null;
+
+        try {
+            conn = getConnection(driver, url, username, password);
+            try {
+                execute(conn, TABLE_MAPPERFBENCHMARK_CREATE, false);
+            } catch (SQLException e) {
+                LogManager.logInfo(LOGGING_CONTEXT, e.getMessage());
+            }
+        } finally {
+            close(conn);
+        }
+    }
+
+    public Timer benchmark(final Map<String, Integer> map, int threads) throws Exception{
+        
+        String className = map.getClass().getSimpleName();
+        System.out.println("Performance Benchmark for " + className + ", with " + threads + " threads");
         
         final Timer timer = new Timer(System.nanoTime());
         ExecutorService executor = Executors.newFixedThreadPool(threads);
@@ -57,18 +131,37 @@ public class MapPerfBenchmark {
         executor.shutdown();
         executor.awaitTermination(1000 * 10, TimeUnit.SECONDS);
         
+        String sql = SQL_MAPPERFBENCHMARK_INSERT_PREFIX + "('" + className + "', " + threads + ", " + timer.getTotal() + ", " + map.size()  + ", " + map.size()  + ", " + map.size() + ")";
+        execute(getConnection(driver, url, username, password), sql, true);
+        map.clear();
+        System.gc();
+        Thread.sleep(200);
         return timer;
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         
-        MapPerfBenchmark benchmark = new MapPerfBenchmark();
+        int count = 10 ;
         
-        System.out.println("500K entried added/retrieved in " + benchmark.benchmark(new ConcurrentHashMap<String, Integer>(), 1).getTotal() + " ms");
+        if(args.length == 1) {
+            try {
+                count = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                usage();
+            }   
+        } else if(args.length > 1){
+            usage();
+        }
         
-        System.out.println("500K entried added/retrieved in " + benchmark.benchmark(new ConcurrentHashMap<String, Integer>(), 4).getTotal() + " ms");
-        
-        System.out.println("500K entried added/retrieved in " + benchmark.benchmark(new ConcurrentHashMap<String, Integer>(), 8).getTotal() + " ms");
+        new MapPerfBenchmark(count).start();
+
+    }
+    
+    private static void usage() {
+        System.out.println("Usage: mapPerf <count>");
+        System.out.println("Options:");
+        System.out.println("       <count> - how many time add/retrieve the map, default is 10");
+        Runtime.getRuntime().exit(1);
     }
 
 }

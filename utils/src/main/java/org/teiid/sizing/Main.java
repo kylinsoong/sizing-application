@@ -51,6 +51,11 @@ public class Main {
     public static final String SQL_WEIGHT_TUPLES = "SELECT CAST((DOUBLE(TIME) / DOUBLE (SIZE)) AS DECIMAL(10,10))AS WEIGHT FROM (SELECT D_SIZE AS SIZE, (D_TIME - GC_TIME) AS TIME FROM DESERIALIZERESULT) AS TMPTABLE";
     
     
+    public static final String TABLE_MAPPERFBENCHMARK_CREATE = "CREATE TABLE MAPPERFBENCHMARK (ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), CLASS_NAME VARCHAR(45) NOT NULL, THREADS INT, T_TIME INT, READ_COUNT BIGINT, WRITE_COUNT BIGINT, GETSIZE_COUNT BIGINT, UNIQUE(ID, CLASS_NAME))";
+    public static final String TABLE_MAPPERFBENCHMARK_TRUNCATE = "TRUNCATE TABLE MAPPERFBENCHMARK";
+    public static final String SQL_MAPPERFBENCHMARK_SELECT = "SELECT ID, CLASS_NAME, THREADS, T_TIME, READ_COUNT, WRITE_COUNT, GETSIZE_COUNT FROM MAPPERFBENCHMARK";
+    public static final String SQL_MAPPERFBENCHMARK_INSERT_PREFIX = "INSERT INTO MAPPERFBENCHMARK (CLASS_NAME, THREADS, T_TIME, READ_COUNT, WRITE_COUNT, GETSIZE_COUNT) VALUES "; 
+    
     public static String char32string() {
         return RandomStringUtils.randomAlphabetic(32);
     }
@@ -93,6 +98,7 @@ public class Main {
     
     private static final String TOOLS_SERIALIZATION = "serialization";
     private static final String TOOLS_DESERIALIZATION = "deserialization";
+    private static final String TOOLS_MAPPERF = "mapPerfBenchmark";
 
     public static void main(String[] args) throws Exception {
 
@@ -117,6 +123,7 @@ public class Main {
         System.out.println("Valid program names are:");
         System.out.println(TAB + TOOLS_SERIALIZATION + COLON + TeiidUtilsPlugin.Util.getString(TOOLS_SERIALIZATION));
         System.out.println(TAB + TOOLS_DESERIALIZATION + COLON + TeiidUtilsPlugin.Util.getString(TOOLS_DESERIALIZATION));
+        System.out.println(TAB + TOOLS_MAPPERF + COLON + "Map Performance Benchmark");
     }
 
 }

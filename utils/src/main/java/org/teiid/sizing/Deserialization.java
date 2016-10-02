@@ -61,7 +61,7 @@ import org.teiid.logging.LogManager;
  * @author kylin
  *
  */
-public class Deserialization {
+public class Deserialization implements Tools {
     
     private final long size;
     private final int count;
@@ -85,6 +85,7 @@ public class Deserialization {
         this.exportCSV = exportCSV;
     }
     
+    @Override
     public void start() throws Exception {
         
         preparation();
