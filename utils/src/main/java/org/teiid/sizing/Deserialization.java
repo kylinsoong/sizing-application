@@ -21,9 +21,9 @@
 */
 package org.teiid.sizing;
 
-import static org.teiid.sizing.util.JDBCUtils.*;
-import static org.teiid.sizing.TeiidUtils.*;
+import static org.teiid.sizing.Main.*;
 import static org.teiid.sizing.utils.CSVUtils.*;
+import static org.teiid.sizing.utils.JDBCUtils.*;
 
 import java.io.FileWriter;
 import java.nio.file.Files;

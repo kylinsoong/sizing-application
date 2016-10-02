@@ -19,9 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
  */
-package org.teiid.sizing.util;
+package org.teiid.sizing.utils;
 
-import static org.teiid.sizing.TeiidUtils.LOGGING_SQL_CONTEXT;
+import static org.teiid.sizing.Main.LOGGING_SQL_CONTEXT;
 
 import java.io.PrintStream;
 import java.io.Reader;

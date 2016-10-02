@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-public class TeiidUtils {
+public class Main {
     
     public static final long ROW_SIZE = 1 << 8;
     public static final long KB = 1 << 10;

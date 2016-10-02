@@ -30,7 +30,7 @@
                     <finalName>${teiid.sizing.dist}</finalName>
                     <archive>
                         <manifest>
-                            <mainClass>org.teiid.sizing.TeiidUtils</mainClass>
+                            <mainClass>org.teiid.sizing.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

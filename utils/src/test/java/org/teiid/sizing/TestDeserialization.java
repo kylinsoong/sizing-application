@@ -1,9 +1,9 @@
 package org.teiid.sizing;
 
 import static org.junit.Assert.*;
-import static org.teiid.sizing.util.JDBCUtils.*;
+import static org.teiid.sizing.utils.JDBCUtils.*;
 import static org.teiid.sizing.Deserialization.*;
-import static org.teiid.sizing.TeiidUtils.*;
+import static org.teiid.sizing.Main.*;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

@@ -5,7 +5,7 @@ Sizing Application contains a series of tools/utils that provides sizing, profil
 
 .*Available Tools*
 |===
-|Name |Function |
+|Name |Function 
 
 |link:deserialization-regression.adoc[Deserialization Weight Calculation]
 |In java deserialization is pretty expensive, we can see it’s 100% processor occupation, the size of content to deserialize is critical for performance, the bigger of size, the larger of time. The time and the size are in a linear relations, eg, `time = weight * size`, this tools use to calculate the deserialization weight.
