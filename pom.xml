@@ -20,7 +20,7 @@
 	<version.junit>4.8.2</version.junit>
 	<version.commons-lang3>3.4</version.commons-lang3>
 
-	<teiid.sizing.dist>teiid-sizing</teiid.sizing.dist>
+	<teiid.sizing.dist>sizing-utils</teiid.sizing.dist>
 
 	<version.assembly.plugin>2.5.5</version.assembly.plugin>
 	<maven.compiler.source>1.8</maven.compiler.source>

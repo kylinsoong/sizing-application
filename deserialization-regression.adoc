@@ -1,4 +1,10 @@
-= Deserialization Weight Calculation
+= What's it
+:toc: manual
+:toc-placement: preamble
+
+This is document for Deserialization Weight Calculation.
+
+== Deserialization Weight Calculation
 
 In java deserialization is pretty expensive, we can see it's 100% processor occupation, the size of content to deserialize is critical for performance, the bigger of size, the larger of time.
 
@@ -23,7 +29,7 @@ The Deserialization Weight Calculation is a tool used to calculate the linear re
 
 [source,java]
 ----
-$ java -jar teiid-sizing-jar.jar deserialization 100
+$ java -jar sizing-utils.jar deserialization 100
 ----
 
 The above command run will output
@@ -48,7 +54,7 @@ In addition to specify a deserialization size, there are other 4 optional option
 
 [source,java]
 ----
-$ java -jar teiid-sizing-jar.jar deserialization <size> <counts> <ratio> <refresh> <dumptuples>
+$ java -jar sizing-utils.jar deserialization <size> <counts> <ratio> <refresh> <dumptuples> <exportCSV>
 ----
 
 |===
@@ -78,6 +84,11 @@ $ java -jar teiid-sizing-jar.jar deserialization <size> <counts> <ratio> <refres
 |whether to dump tuples
 |true
 |false
+
+|exportCSV
+|whether export result to a csv file
+|true
+|false
 |===
 
 NOTE: if counts and size are larger, the deserialization will run long time(several hours).
@@ -90,6 +101,8 @@ NOTE: if counts and size are larger, the deserialization will run long time(seve
 
 == Conclusion
 
-Deserialization time and size in a linear relation, the regression weight is around 0.0000075
+Deserialization time and size in a linear relation, the regression weight is around 0.0000075, in other words
+
+`time = 0.0000075 * size`
 
 image:etc/img/deserialization-weight.png[linear regression weight]

@@ -23,7 +23,12 @@ package org.teiid.sizing;
 
 import static org.teiid.sizing.util.JDBCUtils.*;
 import static org.teiid.sizing.TeiidUtils.*;
+import static org.teiid.sizing.utils.CSVUtils.*;
 
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,6 +37,7 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -41,6 +47,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.teiid.logging.LogManager;
 
+/**
+ * In java deserialization is pretty expensive, we can see it’s 100% processor occupation, the size of content to deserialize is critical for performance, 
+ * the bigger of size, the larger of time.
+ * 
+ * Each time have a reference size, (size 1, time 1),(size 2, time 2), …​, (size n, time n). In statistics, time and size are in a linear regression approach:
+ * <pre>
+ * time = weight * size
+ * </pre>
+ * time - a integer variable, represent how many milliseconds took in deserializing a specific size content.
+ * size - a integer variable, represent how many bytes need to be deserialized.
+ * weight - a integer constant, represent the weight of linear regression.
+ * @author kylin
+ *
+ */
 public class Deserialization {
     
     private final long size;
@@ -48,19 +68,21 @@ public class Deserialization {
     private final boolean dumptuples;
     private final double ratio;
     private final boolean refresh;
+    private final boolean exportCSV;
     
     static String driver = "org.apache.derby.jdbc.EmbeddedDriver";
     static String url = "jdbc:derby:./target/derbyDB;create=true";
     static String username = "user";
     static String password = "user";
 
-    public Deserialization(long size, int count, double ratio, boolean refresh, boolean dumptuples) {
+    public Deserialization(long size, int count, double ratio, boolean refresh, boolean dumptuples, boolean exportCSV) {
         super();
         this.size = size;
         this.count = count;
         this.ratio = ratio;
         this.refresh = refresh;
         this.dumptuples = dumptuples;
+        this.exportCSV = exportCSV;
     }
     
     public void start() throws Exception {
@@ -70,8 +92,10 @@ public class Deserialization {
         countDeserializingTime();
         
         countRegressionWeight();
+        
+        exportResultToCsv();
     }
-    
+
     public void countRegressionWeight() throws Exception {
         
         System.out.println("Calculating linear regression weight");
@@ -210,6 +234,61 @@ public class Deserialization {
             int sizemb = (int) (sizebytes / MB);
             initTestData(sizemb);
         }
+    }
+    
+    public void exportResultToCsv() throws Exception {
+
+        if(!exportCSV){
+            return;
+        }
+        
+        Path result = Files.createFile(Paths.get(".", "deserialization-weight-" +System.currentTimeMillis() + ".csv"));
+        
+        System.out.println("Export Result to " + result);
+        
+        Connection conn = getConnection(driver, url, username, password);
+        
+        List<Long> sizes = new ArrayList<>();
+        List<Integer> times = new ArrayList<>();
+        List<Double> weights = new ArrayList<>();
+        Statement stmt = null;
+        ResultSet rs = null;
+        NumberFormat formatter = new DecimalFormat("#0.0000000000");
+        
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(SQL_DUMP_TUPLES);
+            while(rs.next()){
+                sizes.add(rs.getLong(1));
+                times.add(rs.getInt(2));
+                weights.add(rs.getDouble(3));            
+            }
+        } finally {
+            close(rs, stmt, conn);
+        } 
+        
+        List<Double> weightsClone = new ArrayList<>(weights.size());
+        for(Double d : weights){
+            weightsClone.add(new Double(d));
+        }
+        Collections.sort(weightsClone);
+        int trim = (int) ((1 - ratio) * weights.size()) / 2 ;
+        int start = trim > 0 ? trim -1 : 0 ;
+        int end = weights.size() - trim;
+        Double largerThan = weightsClone.get(start);
+        Double lessThan = weightsClone.get(end);
+        
+        FileWriter writer = new FileWriter(result.toFile());
+        writeLine(writer, Arrays.asList("SIZE", "TIME", "WEIGHT"));
+        
+        for(int i = 0 ; i < weights.size() ; i ++) {
+           if(weights.get(i) >= largerThan && weights.get(i) <= lessThan){
+               writeLine(writer, Arrays.asList(String.valueOf(sizes.get(i)), String.valueOf(times.get(i)), formatter.format(weights.get(i))));
+           }
+        }
+        
+        writer.flush();
+        writer.close();
     }
     
     ThreadPoolExecutor executor;
@@ -363,6 +442,7 @@ public class Deserialization {
         boolean dumptuples = false;
         double ratio = 0.75;
         boolean refresh = false;
+        boolean exportCSV = false;
 
         if(args.length < 1) {
             usage();
@@ -406,6 +486,17 @@ public class Deserialization {
             } catch (NumberFormatException e) {
                 usage();
             }         
+        } else if(args.length == 6){
+            try {
+                size = Integer.parseInt(args[0]);
+                count = Integer.parseInt(args[1]);
+                ratio = Double.parseDouble(args[2]);
+                refresh = Boolean.parseBoolean(args[3]);
+                dumptuples = Boolean.parseBoolean(args[4]);
+                exportCSV = Boolean.parseBoolean(args[5]);
+            } catch (NumberFormatException e) {
+                usage();
+            }         
         } else {
             usage();
         }
@@ -414,7 +505,7 @@ public class Deserialization {
             usage();
         }
         
-        new Deserialization(size, count, ratio, refresh, dumptuples).start();
+        new Deserialization(size, count, ratio, refresh, dumptuples, exportCSV).start();
           
     }
 
@@ -426,12 +517,14 @@ public class Deserialization {
         System.out.println("       deserialization <size> <counts> <ratio>");
         System.out.println("       deserialization <size> <counts> <ratio> <refresh>");
         System.out.println("       deserialization <size> <counts> <ratio> <refresh> <dumptuples>");
+        System.out.println("       deserialization <size> <counts> <ratio> <refresh> <dumptuples> <exportCSV>");
         System.out.println("Options:");
         System.out.println("       <size> - total size in MB to be deserialized, a integer, eg, 100, 200, etc");
         System.out.println("       <counts> - total number of tuples(size, time) to be collected, a integer which should be equals 1 << X, eg, 256, 512, 1024, 2048, etc");
         System.out.println("       <ratio> - a float, less than 1 and larger than 0, the ratio for regression weight");
         System.out.println("       <refresh> - whether refresh tuples, default is false");
         System.out.println("       <dumptuples> - whether dump tuples, default is false");
+        System.out.println("       <exportCSV> - whether export result to a csv file, default is false");
         Runtime.getRuntime().exit(1);
     }
 
